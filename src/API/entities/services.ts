@@ -3,17 +3,16 @@ import { Entity, Filter } from '../../types/interfaces'
 
 export class EntityService {
 	static async getEntitiesByRange({ startId, endId }: Filter) {
-		const data: Array<Entity> = []
+		const promises: Array<Promise<Entity>> = []
 
 		for (let index = startId; index <= endId; index++) {
-			const response = await getData(index)
-
-			if (!Object.entries(response).length)
-				throw new Error('Error no se encuentra para rango especificado')
-
-			data.push(response)
+			promises.push(getData(index))
 		}
 
-		return data
+		const resp = await Promise.all(promises)
+		if (!promises.length)
+			throw new Error('Error no se encuentra para rango especificado')
+
+		return resp
 	}
 }
